@@ -1,0 +1,136 @@
+using TSD.Linq.Task1.Lib;
+using TSD.Linq.Task1.Lib.Model;
+using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
+public class Tasks
+{
+
+    public static void Main(string[] args)
+    {
+        Top3();
+        Earned5Percent();
+        Question4();
+    }
+
+    public static void Top3()
+    {
+        GoldClient goldClient = new GoldClient();
+
+        List<GoldPrice> listGoldPrices = goldClient.GetGoldPrices(new DateTime(2021, 01, 01), new DateTime(2021, 12, 31)).GetAwaiter().GetResult();
+
+        IEnumerable<GoldPrice> orderingListGoldPricesDescending =
+        from listOrdered in listGoldPrices
+        orderby listOrdered.Price descending
+        select listOrdered;
+
+        IEnumerable<GoldPrice> orderingListGoldPricesAscendng =
+        from listOrdered in listGoldPrices
+        orderby listOrdered.Price ascending
+        select listOrdered;
+
+        List<GoldPrice> top3highest = orderingListGoldPricesDescending.Take(3).ToList();
+        Console.WriteLine("TOP3 highest:");
+        Console.WriteLine("1: " + top3highest[0].Price);
+        Console.WriteLine("2: " + top3highest[1].Price);
+        Console.WriteLine("3: " + top3highest[2].Price);
+
+        Console.WriteLine("-----------------");
+
+        List<GoldPrice> top3lowest = orderingListGoldPricesAscendng.Take(3).ToList();
+        Console.WriteLine("TOP3 lowest:");
+        Console.WriteLine("1: " + top3lowest[0].Price);
+        Console.WriteLine("2: " + top3lowest[1].Price);
+        Console.WriteLine("3: " + top3lowest[2].Price);
+
+        Console.WriteLine("-----------------");
+
+
+        using StreamWriter file = new("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\tasks-2-3-4.txt", append: true);
+        file.WriteLineAsync("TOP3 highest:" + " 1: " + top3highest[0].Price + "; 2: " + top3highest[1].Price + "; 3: " + top3highest[2].Price).GetAwaiter().GetResult();
+        file.WriteLineAsync("------------------------------------------").GetAwaiter().GetResult();
+
+        /* try
+        {
+            StreamWriter sw = new StreamWriter("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\top3.txt");
+            sw.WriteLine("TOP3 highest:");
+            sw.WriteLine("1: " + top3highest[0].Price);
+            sw.WriteLine("2: " + top3highest[1].Price);
+            sw.WriteLine("3: " + top3highest[2].Price);
+            sw.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception: " + e.Message);
+        }
+        finally
+        {
+            Console.WriteLine("Executing finally block.");
+        } */
+
+
+    }
+
+    public static void Earned5Percent()
+    {
+        GoldClient goldClient = new GoldClient();
+
+        List<GoldPrice> listGoldPrices = goldClient.GetGoldPrices(new DateTime(2020, 01, 01), new DateTime(2020, 01, 31)).GetAwaiter().GetResult();
+
+        IEnumerable<GoldPrice> earned5percents =
+        from listJanuary in listGoldPrices
+        where listJanuary.Price / listGoldPrices[0].Price >= 1.05
+        select listJanuary;
+
+        List<GoldPrice> dayEarned5 = earned5percents.ToList();
+
+        using StreamWriter file = new("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\tasks-2-3-4.txt", append: true);
+        file.WriteLineAsync("Day of 5%: " + dayEarned5[0].Date).GetAwaiter().GetResult();
+        file.WriteLineAsync("------------------------------------------").GetAwaiter().GetResult();
+
+        Console.WriteLine("Day of 5%:");
+        Console.WriteLine("Date: " + dayEarned5[0].Date);
+
+        Console.WriteLine("-----------------");
+    }
+
+    public static void Question4()
+    {
+        GoldClient goldClient = new GoldClient();
+
+        List<GoldPrice> listGoldPrices2019 = goldClient.GetGoldPrices(new DateTime(2019, 01, 01), new DateTime(2019, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2020 = goldClient.GetGoldPrices(new DateTime(2020, 01, 01), new DateTime(2020, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2021 = goldClient.GetGoldPrices(new DateTime(2021, 01, 01), new DateTime(2021, 12, 31)).GetAwaiter().GetResult();
+
+        listGoldPrices2019.AddRange(listGoldPrices2020);
+        listGoldPrices2019.AddRange(listGoldPrices2021);
+
+
+        IEnumerable<GoldPrice> prices =
+        from listPrices in listGoldPrices2019
+        orderby listPrices.Price descending
+        select listPrices;
+
+        prices = prices.Skip(10);
+
+        List<GoldPrice> listPricesSorted = prices.Take(3).ToList();
+
+        using StreamWriter file = new("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\tasks-2-3-4.txt", append: true);
+        file.WriteLineAsync("3 days");
+        file.WriteLineAsync("Date 1: " + listPricesSorted[0].Date + ", price: " + listPricesSorted[0].Price).GetAwaiter().GetResult();
+        file.WriteLineAsync("Date 2: " + listPricesSorted[1].Date + ", price: " + listPricesSorted[1].Price).GetAwaiter().GetResult();
+        file.WriteLineAsync("Date 3: " + listPricesSorted[2].Date + ", price: " + listPricesSorted[2].Price).GetAwaiter().GetResult();
+        file.WriteLineAsync("------------------------------------------").GetAwaiter().GetResult();
+
+        Console.WriteLine("3 days");
+        Console.WriteLine("Date 1: " + listPricesSorted[0].Date + ", price: " + listPricesSorted[0].Price);
+        Console.WriteLine("Date 2: " + listPricesSorted[1].Date + ", price: " + listPricesSorted[1].Price);
+        Console.WriteLine("Date 3: " + listPricesSorted[2].Date + ", price: " + listPricesSorted[2].Price);
+
+        Console.WriteLine("-----------------");
+    }
+
+
+
+}
