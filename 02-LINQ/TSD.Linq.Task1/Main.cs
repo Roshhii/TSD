@@ -14,6 +14,8 @@ public class Tasks
         Question4();
         Average();
         BestMoments();
+        listToXML();
+        readXML();
     }
 
     public static void Top3()
@@ -208,6 +210,49 @@ public class Tasks
         file.WriteLineAsync("Best day to sell: " + highestDay[0].Date).GetAwaiter().GetResult();
         file.WriteLineAsync("The return of investment: " + (highestDay[0].Price - lowestDay[0].Price)).GetAwaiter().GetResult();
         file.WriteLineAsync("------------------------------------------").GetAwaiter().GetResult();
+    }
+
+    public static void listToXML()
+    {
+        GoldClient goldClient = new GoldClient();
+
+        List<GoldPrice> listGoldPrices2019 = goldClient.GetGoldPrices(new DateTime(2019, 01, 01), new DateTime(2019, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2020 = goldClient.GetGoldPrices(new DateTime(2020, 01, 01), new DateTime(2020, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2021 = goldClient.GetGoldPrices(new DateTime(2021, 01, 01), new DateTime(2021, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2022 = goldClient.GetGoldPrices(new DateTime(2022, 01, 01), new DateTime(2022, 03, 13)).GetAwaiter().GetResult();
+
+
+        listGoldPrices2019.AddRange(listGoldPrices2020);
+        listGoldPrices2019.AddRange(listGoldPrices2021);
+        listGoldPrices2019.AddRange(listGoldPrices2022);
+        
+        XDocument file = new XDocument(new XElement("List_of_prices",
+        from prices in listGoldPrices2019
+        select new XElement("Gold",
+               new XElement("Date", prices.Date),
+               new XElement("Price", prices.Price)
+        )));
+
+        file.Declaration = new XDeclaration("1.0", "utf-8", "true");
+        file.Save("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\ListOfPrice.xml");
+
+        Console.WriteLine("XML file created.");
+    }
+
+    public static void readXML()
+    {
+        XDocument file = XDocument.Load("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\ListOfPrice.xml");
+        printPrices(file);
+    }
+
+    public static void printPrices(XDocument file)
+    {
+        foreach (XElement price in file.Root.Elements())
+        {
+            Console.WriteLine("Date:" + price.Element("Date").Value);
+            Console.WriteLine("Price:" + price.Element("Price").Value);
+
+        }
     }
 
 
