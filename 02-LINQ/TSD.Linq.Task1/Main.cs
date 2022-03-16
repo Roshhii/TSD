@@ -12,6 +12,8 @@ public class Tasks
         Top3();
         Earned5Percent();
         Question4();
+        Average();
+        BestMoments();
     }
 
     public static void Top3()
@@ -129,6 +131,83 @@ public class Tasks
         Console.WriteLine("Date 3: " + listPricesSorted[2].Date + ", price: " + listPricesSorted[2].Price);
 
         Console.WriteLine("-----------------");
+    }
+
+    public static void Average()
+    {
+        GoldClient goldClient = new GoldClient();
+
+        List<GoldPrice> listGoldPrices2019 = goldClient.GetGoldPrices(new DateTime(2019, 01, 01), new DateTime(2019, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2020 = goldClient.GetGoldPrices(new DateTime(2020, 01, 01), new DateTime(2020, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2021 = goldClient.GetGoldPrices(new DateTime(2021, 01, 01), new DateTime(2021, 12, 31)).GetAwaiter().GetResult();
+
+        IEnumerable<double> prices2019 =
+        from listPrices in listGoldPrices2019
+        select listPrices.Price;
+
+        double average2019 = prices2019.ToList().Average();
+
+        IEnumerable<double> prices2020 =
+        from listPrices in listGoldPrices2020
+        select listPrices.Price;
+
+        double average2020 = prices2020.ToList().Average();
+
+        IEnumerable<double> prices2021 =
+        from listPrices in listGoldPrices2021
+        select listPrices.Price;
+
+        double average2021 = prices2021.ToList().Average();
+
+        using StreamWriter file = new("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\tasks-8-9.txt", append: true);
+        file.WriteLineAsync("Average 2019: " + average2019).GetAwaiter().GetResult();
+        file.WriteLineAsync("Average 2020: " + average2020).GetAwaiter().GetResult();
+        file.WriteLineAsync("Average 2021: " + average2021).GetAwaiter().GetResult();
+        file.WriteLineAsync("------------------------------------------").GetAwaiter().GetResult();
+
+        Console.WriteLine("Average 2019: " + average2019);
+        Console.WriteLine("Average 2020: " + average2020);
+        Console.WriteLine("Average 2021: " + average2021);
+        Console.WriteLine("-----------------");
+    }
+
+    public static void BestMoments()
+    {
+        GoldClient goldClient = new GoldClient();
+
+        List<GoldPrice> listGoldPrices2019 = goldClient.GetGoldPrices(new DateTime(2019, 01, 01), new DateTime(2019, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2020 = goldClient.GetGoldPrices(new DateTime(2020, 01, 01), new DateTime(2020, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2021 = goldClient.GetGoldPrices(new DateTime(2021, 01, 01), new DateTime(2021, 12, 31)).GetAwaiter().GetResult();
+        List<GoldPrice> listGoldPrices2022 = goldClient.GetGoldPrices(new DateTime(2022, 01, 01), new DateTime(2022, 03, 13)).GetAwaiter().GetResult();
+
+        listGoldPrices2019.AddRange(listGoldPrices2020);
+        listGoldPrices2019.AddRange(listGoldPrices2021);
+        listGoldPrices2019.AddRange(listGoldPrices2022);
+
+
+        IEnumerable<GoldPrice> lowestPrices =
+        from listPrices in listGoldPrices2019
+        orderby listPrices.Price ascending
+        select listPrices;
+
+        List<GoldPrice> lowestDay = lowestPrices.Take(1).ToList();
+        Console.WriteLine("Best day to buy: " + lowestDay[0].Date);
+
+        IEnumerable<GoldPrice> highestPrices =
+        from listPrices in listGoldPrices2019
+        orderby listPrices.Price descending
+        select listPrices;
+
+        List<GoldPrice> highestDay = highestPrices.Take(1).ToList();
+        Console.WriteLine("Best day to sell: " + highestDay[0].Date);
+
+        Console.WriteLine("The return of investment: " + (highestDay[0].Price - lowestDay[0].Price));
+
+        using StreamWriter file = new("C:\\Users\\auffr\\Documents\\semestre_pologne\\tech_soft_dev\\tasks-8-9.txt", append: true);
+        file.WriteLineAsync("Best day to buy: " + lowestDay[0].Date).GetAwaiter().GetResult();
+        file.WriteLineAsync("Best day to sell: " + highestDay[0].Date).GetAwaiter().GetResult();
+        file.WriteLineAsync("The return of investment: " + (highestDay[0].Price - lowestDay[0].Price)).GetAwaiter().GetResult();
+        file.WriteLineAsync("------------------------------------------").GetAwaiter().GetResult();
     }
 
 
