@@ -18,6 +18,7 @@ namespace TSD.Linq.Task1.Lib.Test
         }
 
         [Test]
+        //That is the first test
         public void CurrentPriceNotNullTest()
         {
             GoldPrice currentPrice = goldClient.GetCurrentGoldPrice().GetAwaiter().GetResult();
