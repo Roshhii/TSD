@@ -41,6 +41,7 @@ module ClassModule
       end
     end
   end
+  alias_method :random, :sample
 end
 
 class Integer
@@ -50,3 +51,4 @@ end
 Integer.sample(5)
 # Integer.sample(-1)
 
+Integer.random(5)
